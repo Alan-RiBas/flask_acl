@@ -26,9 +26,7 @@ def reset_db():
     dialect = url.get_dialect().name
     database_name = url.database
 
-    # -------------------------------------------------------------------
     # 1. MYSQL → DROPAR E RECRIAR BANCO
-    # -------------------------------------------------------------------
     if dialect == "mysql":
         click.echo(f"🗑️  Deletando e recriando banco MySQL: {database_name}")
 
@@ -49,9 +47,7 @@ def reset_db():
 
         click.echo("✅ Banco MySQL recriado com sucesso!")
 
-    # -------------------------------------------------------------------
     # 2. SQLITE → APAGAR ARQUIVO
-    # -------------------------------------------------------------------
     elif dialect == "sqlite":
         if os.path.exists(database_name):
             click.echo(f"🗑️  Removendo arquivo SQLite: {database_name}")
@@ -61,18 +57,14 @@ def reset_db():
         click.echo(f"❌ Dialeto não suportado: {dialect}")
         return
 
-    # -------------------------------------------------------------------
     # 3. REMOVER migrations/ PARA RECRIAR DO ZERO
-    # -------------------------------------------------------------------
     migrations_dir = os.path.join(os.getcwd(), "migrations")
 
     if os.path.exists(migrations_dir):
         click.echo("🗑️  Removendo pasta migrations...")
         shutil.rmtree(migrations_dir)
 
-    # -------------------------------------------------------------------
     # 4. RECRIAR MIGRATIONS
-    # -------------------------------------------------------------------
     click.echo("📁 Criando pasta migrations...")
     init()
 
@@ -82,9 +74,7 @@ def reset_db():
     click.echo("🚀 Aplicando migrações...")
     upgrade()
 
-    # -------------------------------------------------------------------
     # 5. EXECUTAR SEED INICIAL
-    # -------------------------------------------------------------------
     click.echo("🌱 Executando seed inicial...")
 
     from app.commands.create_db import create_db

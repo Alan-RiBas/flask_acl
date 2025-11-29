@@ -21,7 +21,7 @@ def seed_roles():
     
     db.session.commit()
 
-    # 2. Adicionar PERMISSÕES ao ADMIN
+    # 2. Adiciona PERMISSÕES ao ADMIN
     admin_role = Role.query.filter_by(name="admin").first()
     admin_role.permissions = Permission.query.all()
     db.session.add(admin_role)
