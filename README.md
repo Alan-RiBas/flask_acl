@@ -40,6 +40,12 @@ Crie um arquivo `.env` na raiz do projeto:
 ``` bash
 flask create-db
 ```
+- Caso o banco já tenha sido criado e precisa refazer as migrations e seeds
+
+``` bash
+flask reset-db
+```
+
 
 ## ▶️ Executando o servidor
 
