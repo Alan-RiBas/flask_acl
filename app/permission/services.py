@@ -1,12 +1,6 @@
 from extensions import db
 from app.models import User, Role, Permission
 
-def create_role(name):
-    r = Role(name=name)
-    db.session.add(r)
-    db.session.commit()
-    return r
-
 def create_permission(name):
     p = Permission(name=name)
     db.session.add(p)

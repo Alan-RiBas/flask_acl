@@ -1,48 +1,34 @@
-from flask import request, jsonify, current_app
-from . import auth_bp
-from app.models import User
-import jwt
-import datetime
+from app.decorators import require_permission
+from flask import request, current_app
+from flask_restx import Resource
+from .schemas import auth_ns, login_model, token_response, user_model, error_model
+from .auth_services import AuthService
+
+@auth_ns.route("/login")
+class LoginResource(Resource):
+
+    @auth_ns.expect(login_model)
+    @auth_ns.response(200, "Success", token_response)
+    @auth_ns.response(401, "Invalid Credentials", error_model)
+
+    def post(self):
+        try:
+            data = request.json or {}
+            return AuthService.login(data)
+        except Exception:
+            return {"error": "invalid_request"}, 400
 
 
-@auth_bp.post('/login')
-def login():
-    data = request.json or {}
-    email = data.get('email')
-    password = data.get('password')
+@auth_ns.route("/me")
+class MeResource(Resource):
 
-
-    user = User.query.filter_by(email=email).first()
-    if not user or not user.check_password(password):
-        return jsonify({'error': 'invalid_credentials'}), 401
-
-
-    payload = {
-        'sub': user.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8)
-    }
-    token = jwt.encode(payload, current_app.config['JWT_SECRET'], algorithm='HS256')
-
-
-    return jsonify({
-        'access_token': token,
-        'user': user.as_dict()
-    })
-
-
-@auth_bp.get('/me')
-def me():
-    auth = request.headers.get('Authorization')
-    if not auth:
-        return jsonify({'error': 'missing_token'}), 401
-    token = auth.split()[-1]
-    try:
-        payload = jwt.decode(token, current_app.config['JWT_SECRET'], algorithms=['HS256'])
-        user = User.query.get(payload['sub'])
-        if not user:
-            return jsonify({'error': 'user_not_found'}), 404
-        return jsonify(user.as_dict())
-    except jwt.ExpiredSignatureError:
-        return jsonify({'error': 'token_expired'}), 401
-    except Exception:
-        return jsonify({'error': 'invalid_token'}), 401
+    @require_permission('view_user')
+    @auth_ns.response(200, "Success", user_model)
+    @auth_ns.response(401, "Invalid or expired token", error_model)
+    @auth_ns.response(404, "User not found", error_model)
+    @auth_ns.response(400, "Missing token", error_model)
+    def get(self):
+        try:
+            return AuthService.get_me()
+        except Exception:
+            return {"error": "invalid_token"}, 401

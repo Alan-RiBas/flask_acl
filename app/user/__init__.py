@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+user_bp = Blueprint("user", __name__, url_prefix="/user")
 
 from .routes import *
 from .schemas import *

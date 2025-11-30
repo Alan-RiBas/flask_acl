@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from config import Config
-from extensions import db, migrate
+from extensions import db, migrate, api
 from app.commands.create_db import create_db
 from app.commands.reset_db import reset_db
 from app.commands.seed_users import seed_users
@@ -9,9 +9,13 @@ from app.commands.seed_roles import seed_roles
 from app.commands.seed_permissions import seed_permissions
 
 
+from .auth.schemas import auth_ns
+from .user.schemas import user_ns
+from .role.schemas import role_ns
+
 # blueprints
-from .acl import acl_bp
-from .auth import auth_bp
+# from .acl import acl_bp
+# from .auth import auth_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -21,11 +25,15 @@ def create_app(config_class=Config):
 
     # ext
     db.init_app(app)
+    api.init_app(app)
     migrate.init_app(app, db)
 
     # register blueprints
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(acl_bp)
+    # app.register_blueprint(auth_bp)
+    # app.register_blueprint(acl_bp)
+    api.add_namespace(auth_ns)
+    api.add_namespace(user_ns)
+    api.add_namespace(role_ns)
     
     # register commands
     app.cli.add_command(create_db)
