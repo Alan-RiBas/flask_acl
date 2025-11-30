@@ -8,20 +8,17 @@ from app.commands.seed_users import seed_users
 from app.commands.seed_roles import seed_roles
 from app.commands.seed_permissions import seed_permissions
 
-
+# blueprints
 from .auth.schemas import auth_ns
 from .user.schemas import user_ns
 from .role.schemas import role_ns
-
-# blueprints
-# from .acl import acl_bp
-# from .auth import auth_bp
+from .permission.schemas import permission_ns
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    cors = CORS(app, origins=app.config["CORS_ORIGINS"], supports_credentials=True)
+    CORS(app, origins=app.config["CORS_ORIGINS"], supports_credentials=True)
 
     # ext
     db.init_app(app)
@@ -29,11 +26,10 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
 
     # register blueprints
-    # app.register_blueprint(auth_bp)
-    # app.register_blueprint(acl_bp)
     api.add_namespace(auth_ns)
     api.add_namespace(user_ns)
     api.add_namespace(role_ns)
+    api.add_namespace(permission_ns)
     
     # register commands
     app.cli.add_command(create_db)

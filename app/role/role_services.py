@@ -4,18 +4,18 @@ from app.models import Role
 class RoleService:
     
     @staticmethod
-    def create_role(name):
+    def create(name):
         r = Role(name=name)
         db.session.add(r)
         db.session.commit()
         return r
     
     @staticmethod
-    def get_all_roles():
+    def get_all():
         return Role.query.all()
     
     @staticmethod
-    def update_role(role_id, name):
+    def update(role_id, name):
         role = Role.query.get(role_id)
         if role:
             role.name = name
@@ -23,7 +23,7 @@ class RoleService:
         return role
     
     @staticmethod
-    def delete_role(role_id):
+    def delete(role_id):
         role = Role.query.get(role_id)
         if role:
             db.session.delete(role)

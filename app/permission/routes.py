@@ -1,48 +1,67 @@
-from flask import request, jsonify
-from . import acl_bp
-from extensions import db
-from app.models import Permission
-from .decorators import require_permission
-from .services import create_permission
+from flask_restx import Resource
+from .schemas import permission_ns, permission_model, create_permission_model, update_permission_model, error_model
+from ..decorators import require_permission
+from .permission_services import PermissionService
 
-@acl_bp.get('/permissions')
-@require_permission('view_permissions')
-def list_permissions():
-    try:
-        perms = Permission.query.order_by(Permission.id).all()
-        return jsonify([p.as_dict() for p in perms]), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
 
-@acl_bp.post('/permissions')
-@require_permission('create_permission')
-def create_permission_route():
-    try:
-        data = request.json or {}
-        p = create_permission(data.get('name'))
-        return jsonify({'id': p.id, 'name': p.name}), 201
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+@permission_ns.route('')
+class PermissionListResource(Resource):
+    @permission_ns.doc('list_permissions')
+    @permission_ns.marshal_list_with(permission_model, code=200, description="Success")
+    @permission_ns.response(401, "Invalid or expired token", error_model)
+    @permission_ns.response(403, "Forbidden", error_model)
+    @permission_ns.response(400, "Bad Request", error_model)
+    @require_permission('view_permissions')
+    def get(self):
+        try:
+            return PermissionService.get_all()
+        except Exception as e:
+            permission_ns.abort(400, str(e))
+    
+    @permission_ns.doc('create_permission')
+    @permission_ns.expect(create_permission_model, validate=True)
+    @permission_ns.marshal_with(permission_model, code=201, description="Permission created")
+    @permission_ns.response(401, "Invalid or expired token", error_model)
+    @permission_ns.response(403, "Forbidden", error_model)
+    @permission_ns.response(400, "Bad Request", error_model)
+    @require_permission('create_permission')
+    def post(self):
+        try:
+            data = permission_ns.payload or {}
+            r = PermissionService.create(data.get('name'))
+            return {'id': r.id, 'name': r.name}, 201
+        except Exception as e:
+            permission_ns.abort(400, str(e))
 
-@acl_bp.put('/permissions/<int:permission_id>')
-@require_permission('edit_permission')
-def edit_permission(permission_id):
-    try:
-        permission = Permission.query.get_or_404(permission_id)
-        data = request.json or {}
-        permission.name = data.get('name', permission.name)
-        db.session.commit()
-        return jsonify({'id': permission.id, 'name': permission.name}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
-@acl_bp.delete('/permissions/<int:permission_id>')
-@require_permission('delete_permission')
-def delete_permission(permission_id):
-    try:
-        permission = Permission.query.get_or_404(permission_id)
-        db.session.delete(permission)
-        db.session.commit()
-        return jsonify({'message': 'permission_deleted'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+@permission_ns.route('/<int:permission_id>')
+@permission_ns.param('permission_id', 'The Permission identifier')
+class PermissionResource(Resource):
+    
+    @permission_ns.doc('edit_permission')
+    @permission_ns.expect(update_permission_model, validate=True)
+    @permission_ns.marshal_with(permission_model, code=200, description="Permission updated")
+    @permission_ns.response(401, "Invalid or expired token", error_model)
+    @permission_ns.response(403, "Forbidden", error_model)
+    @permission_ns.response(400, "Bad Request", error_model)
+    @permission_ns.response(404, "Permission not found", error_model)
+    @require_permission('edit_permission')
+    def put(self, permission_id):
+        try:
+            data = permission_ns.payload or {}
+            PermissionService.update(permission_id, data.get('name'))
+        except Exception as e:
+            permission_ns.abort(400, str(e))
+    
+    @permission_ns.doc('delete_role')
+    @permission_ns.response(200, "Role deleted")
+    @permission_ns.response(401, "Invalid or expired token", error_model)
+    @permission_ns.response(403, "Forbidden", error_model)
+    @permission_ns.response(400, "Bad Request", error_model)
+    @permission_ns.response(404, "Role not found", error_model)
+    @require_permission('delete_role')
+    def delete(self, permission_id):
+        try:
+            PermissionService.delete(permission_id)
+            return {'message': 'permission_deleted'}, 200
+        except Exception as e:
+            permission_ns.abort(400, str(e))

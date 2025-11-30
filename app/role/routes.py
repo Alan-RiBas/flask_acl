@@ -14,7 +14,7 @@ class RoleListResource(Resource):
     @require_permission('view_roles')
     def get(self):
         try:
-            return RoleService.get_all_roles()
+            return RoleService.get_all()
         except Exception as e:
             role_ns.abort(400, str(e))
     
@@ -28,12 +28,13 @@ class RoleListResource(Resource):
     def post(self):
         try:
             data = role_ns.payload or {}
-            r = RoleService.create_role(data.get('name'))
+            r = RoleService.create(data.get('name'))
             return {'id': r.id, 'name': r.name}, 201
         except Exception as e:
             role_ns.abort(400, str(e))
 
 @role_ns.route('/<int:role_id>')
+@role_ns.param('role_id', 'The Role identifier')
 class RoleResource(Resource):
     
     @role_ns.doc('edit_role')
@@ -47,7 +48,7 @@ class RoleResource(Resource):
     def put(self, role_id):
         try:
             data = role_ns.payload or {}
-            RoleService.update_role(role_id, data.get('name'))
+            RoleService.update(role_id, data.get('name'))
         except Exception as e:
             role_ns.abort(400, str(e))
     
@@ -60,52 +61,7 @@ class RoleResource(Resource):
     @require_permission('delete_role')
     def delete(self, role_id):
         try:
-            RoleService.delete_role(role_id)
+            RoleService.delete(role_id)
             return {'message': 'role_deleted'}, 200
         except Exception as e:
             role_ns.abort(400, str(e))
-
-    
-
-    
-
-# @require_permission('view_roles')
-# def list_roles():
-#     try:
-#         roles = Role.query.all()
-#         return jsonify([r.as_dict() for r in roles])
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 400
-
-# @acl_bp.post('/roles')
-# @require_permission('create_role')
-# def create_role_route():
-#     try:
-#         data = request.json or {}
-#         r = create_role(data.get('name'))
-#         return jsonify({'id': r.id, 'name': r.name}), 201
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 400
-
-# @acl_bp.put('/roles/<int:role_id>')
-# @require_permission('edit_role')
-# def edit_role(role_id):
-#     try:
-#         role = Role.query.get_or_404(role_id)
-#         data = request.json or {}
-#         role.name = data.get('name', role.name)
-#         db.session.commit()
-#         return jsonify({'id': role.id, 'name': role.name}), 200
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 400
-
-# @acl_bp.delete('/roles/<int:role_id>')
-# @require_permission('delete_role')
-# def delete_role(role_id):
-#     try:
-#         role = Role.query.get_or_404(role_id)
-#         db.session.delete(role)
-#         db.session.commit()
-#         return jsonify({'message': 'role_deleted'}), 200
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 400
