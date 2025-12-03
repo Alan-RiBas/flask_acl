@@ -20,7 +20,7 @@ class PermissionListResource(Resource):
     
     @permission_ns.doc('create_permission')
     @permission_ns.expect(create_permission_model, validate=True)
-    @permission_ns.marshal_with(permission_model, code=201, description="Permission created")
+    @permission_ns.response(201, "Permission created", permission_model)
     @permission_ns.response(401, "Invalid or expired token", error_model)
     @permission_ns.response(403, "Forbidden", error_model)
     @permission_ns.response(400, "Bad Request", error_model)

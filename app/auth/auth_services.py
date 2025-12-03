@@ -1,8 +1,6 @@
 
-from flask import request, current_app
-from extensions import db
+from flask import request
 from app.models import User
-# import jwt, datetime
 from app.utils.token_generate import generate_token, decode_token
 
 class AuthService:

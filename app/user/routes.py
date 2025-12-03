@@ -1,3 +1,4 @@
+from app.models.user import User
 from flask import request
 from flask_restx import Resource
 from ..decorators import require_permission
@@ -21,10 +22,11 @@ class UserListResource(Resource):
         
     @require_permission('create_user')
     @user_ns.expect(create_user_model, validate=True)
-    @user_ns.marshal_with(user_model, code=201, description="User Created")
+    @user_ns.response(201, "User Created", user_model)
     @user_ns.response(401, "Invalid or expired token", error_model)
     @user_ns.response(403, "Forbidden", error_model)
     @user_ns.response(400, "Bad Request", error_model)
+
     def post(self):
         try:
             data = request.json or {}
@@ -32,8 +34,7 @@ class UserListResource(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
-
-@user_ns.route('/<int:user_id>')
+@user_ns.route('/<string:user_id>')
 @user_ns.param('user_id', 'The User identifier')
 class UserResource(Resource):
 
@@ -50,7 +51,7 @@ class UserResource(Resource):
         
     @require_permission('edit_user')
     @user_ns.expect(update_user_model, validate=True)
-    @user_ns.marshal_with(user_model, code=200, description="User Updated")
+    @user_ns.response(200, "User Updated", user_model)
     @user_ns.response(401, "Invalid or expired token", error_model)
     @user_ns.response(403, "Forbidden", error_model)
     @user_ns.response(400, "Bad Request", error_model)

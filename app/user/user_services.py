@@ -15,22 +15,25 @@ class UserService:
     
     @staticmethod
     def create_user(data):
-        user = User(name=data.get('name'), email=data.get('email'))
+        if User.query.filter_by(email=data.get('email')).first():
+            return {'error': 'Email already exists'}, 400
+        role_names = data.get('roles', []) or []
+        roles = Role.query.filter(Role.name.in_(role_names)).all()
+        user = User(name=data.get('name'), email=data.get('email'), roles=roles)
+    
         user.set_password(data.get('password', 'changeme'))
         db.session.add(user)
         db.session.commit()
-        return {'message': 'user_created', 'id': user.id}, 201
+        return {'message': 'user_created'}, 201
     
     @staticmethod
-    def edit_user(user_id, data):
+    def edit_user(user_id: str, data):
         user = User.query.get(user_id)
         if not user:
             raise ValueError("User not found")
-
+        
         if "name" in data:
             user.name = data["name"]
-        if "email" in data:
-            user.email = data["email"]
         if "password" in data:
             user.set_password(data["password"])
         if "roles" in data:

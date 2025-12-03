@@ -4,7 +4,7 @@ from extensions import api
 user_ns = api.namespace("user", description="User Endpoints")
 
 user_model = user_ns.model("User", {
-    "id": fields.Integer,
+    "id": fields.String,
     "name": fields.String(required=True),
     "email": fields.String(required=True),
     "roles": fields.String(description="Role name")
@@ -19,7 +19,6 @@ create_user_model = user_ns.model("CreateUser", {
 
 update_user_model = user_ns.model("UpdateUser", {
     "name": fields.String(description="The user's name"),
-    "email": fields.String(description="The user's email"),
     "password": fields.String(description="The user's password"),
     "roles": fields.List(fields.String, description="List of role names")
 })
@@ -30,5 +29,5 @@ token_response = user_ns.model("TokenResponse", {
 })
 
 error_model = user_ns.model("Error", {
-    "error": fields.String
+    "error": fields.String(description="Error message")
 })

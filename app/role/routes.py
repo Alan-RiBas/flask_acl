@@ -20,7 +20,7 @@ class RoleListResource(Resource):
     
     @role_ns.doc('create_role')
     @role_ns.expect(create_role_model, validate=True)
-    @role_ns.marshal_with(role_model, code=201, description="Role created")
+    @role_ns.response(201, "Role Created", role_model)
     @role_ns.response(401, "Invalid or expired token", error_model)
     @role_ns.response(403, "Forbidden", error_model)
     @role_ns.response(400, "Bad Request", error_model)
@@ -39,7 +39,7 @@ class RoleResource(Resource):
     
     @role_ns.doc('edit_role')
     @role_ns.expect(update_role_model, validate=True)
-    @role_ns.marshal_with(role_model, code=200, description="Role updated")
+    @role_ns.response(200, "Role Updated", role_model)
     @role_ns.response(401, "Invalid or expired token", error_model)
     @role_ns.response(403, "Forbidden", error_model)
     @role_ns.response(400, "Bad Request", error_model)

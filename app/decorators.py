@@ -1,6 +1,6 @@
 from functools import wraps
-from flask import request, current_app
-import jwt
+from flask import request
+from app.utils.token_generate import decode_token
 from app.models import User
 
 def get_current_user():
@@ -11,11 +11,7 @@ def get_current_user():
     token = auth.split()[-1]
 
     try:
-        payload = jwt.decode(
-            token,
-            current_app.config['JWT_SECRET'],
-            algorithms=['HS256']
-        )
+        payload = decode_token(token)
         return User.query.get(payload['sub'])
     except Exception:
         return None

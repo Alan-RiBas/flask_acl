@@ -9,10 +9,13 @@ class PermissionService:
 
     @staticmethod
     def get_by_id(permission_id):
-        return Permission.query.get(permission_id)
+        return Permission.query.get_or_404(permission_id)
     
     @staticmethod
     def create(name):
+        name = name.replace(" ", "_").lower()
+        if Permission.query.filter_by(name=name).first():
+            raise ValueError("Permission with this name already exists")
         perm = Permission(name=name)
         db.session.add(perm)
         db.session.commit()
@@ -20,9 +23,12 @@ class PermissionService:
 
     @staticmethod
     def update(permission_id, name):
-        perm = PermissionService.get_by_id(permission_id)
+        name = name.replace(" ", "_").lower()
+        perm = Permission.query.get(permission_id)
         if not perm:
             raise ValueError("Permission not found")
+        if Permission.query.filter_by(name=name).first():
+            raise ValueError("Permission with this name already exists")
         perm.name = name
         db.session.commit()
         return perm
