@@ -1,18 +1,21 @@
 import uuid
+from app.utils.uuid_gen import generate_uuid
 from extensions import db
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 user_roles = db.Table(
     "user_roles",
-    db.Column("users_id", db.ForeignKey("users.id"), primary_key=True),
+    # db.Column("users_id", db.ForeignKey("users.id"), primary_key=True),
+    db.Column("users_id", db.String(36), db.ForeignKey("users.id"), primary_key=True),
     db.Column("roles_id", db.ForeignKey("roles.id"), primary_key=True),
 )
 
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    # id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid, nullable=False)
     name = db.Column(db.String(168), unique=True, nullable=False)
     email = db.Column(db.String(68), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)

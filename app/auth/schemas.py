@@ -12,7 +12,8 @@ user_model = auth_ns.model("User", {
     "id": fields.Integer,
     "name": fields.String,
     "email": fields.String,
-    "roles": fields.String
+    "roles": fields.String,
+    "permissions": fields.List(fields.String)
 })
 
 token_response = auth_ns.model("TokenResponse", {

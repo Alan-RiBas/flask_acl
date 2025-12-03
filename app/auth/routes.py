@@ -1,7 +1,7 @@
 from app.decorators import require_permission
 from flask import request, current_app
 from flask_restx import Resource
-from .schemas import auth_ns, login_model, token_response, user_model, error_model
+from .schemas import auth_ns, login_model, token_response, error_model, user_model
 from .auth_services import AuthService
 
 @auth_ns.route("/login")
