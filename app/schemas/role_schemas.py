@@ -5,18 +5,15 @@ role_ns = api.namespace("role", description="Role Endpoints")
 
 role_model = role_ns.model("Role", {
     "id": fields.Integer,
-    "name": fields.String(required=True),
-    "permissions": fields.List(fields.String)
+    "name": fields.String(required=True)
 })
 
 create_role_model = role_ns.model("CreateRole", {
     "name": fields.String(required=True, description="The role's name"),
-    "permissions": fields.List(fields.String, description="List of permission names")
 })
 
 update_role_model = role_ns.model("UpdateRole", {
     "name": fields.String(description="The role's name"),
-    "permissions": fields.List(fields.String, description="List of permission names")
 })
 
 token_response = role_ns.model("TokenResponse", {

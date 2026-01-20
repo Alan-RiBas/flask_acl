@@ -1,7 +1,7 @@
 from flask_restx import Resource
-from .schemas import role_ns, role_model, create_role_model, update_role_model, error_model
+from app.schemas.role_schemas import role_ns, role_model, create_role_model, update_role_model, error_model
 from ..decorators import require_permission
-from .role_services import RoleService
+from app.services.role_services import RoleService
 
 
 @role_ns.route('')
@@ -17,7 +17,7 @@ class RoleListResource(Resource):
             return RoleService.get_all()
         except Exception as e:
             role_ns.abort(400, str(e))
-
+    
     @role_ns.doc('create_role')
     @role_ns.expect(create_role_model, validate=True)
     @role_ns.response(201, "Role Created", role_model)
@@ -28,27 +28,14 @@ class RoleListResource(Resource):
     def post(self):
         try:
             data = role_ns.payload or {}
-            r = RoleService.create(data.get('name'), data.get('permissions'))
-            return {'id': r.id, 'name': r.name, 'permissions': [p.name for p in r.permissions]}, 201
+            r = RoleService.create(data.get('name'))
+            return {'id': r.id, 'name': r.name}, 201
         except Exception as e:
             role_ns.abort(400, str(e))
 
 @role_ns.route('/<int:role_id>')
 @role_ns.param('role_id', 'The Role identifier')
 class RoleResource(Resource):
-
-    @role_ns.doc('get_role')
-    @role_ns.response(200, "Success", role_model)
-    @role_ns.response(401, "Invalid or expired token", error_model)
-    @role_ns.response(403, "Forbidden", error_model)
-    @role_ns.response(400, "Bad Request", error_model)
-    @role_ns.response(404, "Role not found", error_model)
-    @require_permission('view_roles')
-    def get(self, role_id):
-        try:
-            return RoleService.get_by_id(role_id)
-        except Exception as e:
-            role_ns.abort(400, str(e))
     
     @role_ns.doc('edit_role')
     @role_ns.expect(update_role_model, validate=True)
@@ -61,7 +48,7 @@ class RoleResource(Resource):
     def put(self, role_id):
         try:
             data = role_ns.payload or {}
-            RoleService.update(role_id, data.get('name'), data.get('permissions'))
+            RoleService.update(role_id, data.get('name'))
         except Exception as e:
             role_ns.abort(400, str(e))
     

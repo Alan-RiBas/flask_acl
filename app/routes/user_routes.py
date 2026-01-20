@@ -1,9 +1,8 @@
-from app.models.user import User
 from flask import request
 from flask_restx import Resource
 from ..decorators import require_permission
-from .user_services import UserService
-from .schemas import user_ns, user_model, create_user_model, update_user_model, error_model
+from app.services.user_services import UserService
+from app.schemas.user_schemas import user_ns, user_model, create_user_model, update_user_model, error_model
 
 
 @user_ns.route('')

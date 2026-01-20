@@ -9,10 +9,10 @@ from app.commands.seed_roles import seed_roles
 from app.commands.seed_permissions import seed_permissions
 
 # blueprints
-from .auth.schemas import auth_ns
-from .user.schemas import user_ns
-from .role.schemas import role_ns
-from .permission.schemas import permission_ns
+from app.routes.auth_routes import auth_ns
+from app.routes.user_routes import user_ns
+from app.routes.role_routes import role_ns
+from app.routes.permission_routes import permission_ns
 
 def create_app(config_class=Config):
     app = Flask(__name__)

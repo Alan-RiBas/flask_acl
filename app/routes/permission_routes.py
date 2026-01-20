@@ -1,7 +1,7 @@
 from flask_restx import Resource
-from .schemas import permission_ns, permission_model, create_permission_model, update_permission_model, error_model
+from app.schemas.permission_schemas import permission_ns, permission_model, create_permission_model, update_permission_model, error_model
 from ..decorators import require_permission
-from .permission_services import PermissionService
+from app.services.permission_services import PermissionService
 
 
 @permission_ns.route('')
