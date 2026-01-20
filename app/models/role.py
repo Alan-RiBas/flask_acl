@@ -24,7 +24,7 @@ class Role(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            # "permissions": [permission.name for permission in self.permissions]
+            "permissions": [permission.name for permission in self.permissions]
         }
 
     def __repr__(self):
